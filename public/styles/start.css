@@ -99,6 +99,11 @@ will-change: opacity, filter;
   transition: opacity 260ms ease, transform 260ms ease;
 }
 
+/* 体験中は子要素も強制無効化 */
+#app:not(.start) .legal-item {
+  pointer-events: none !important;
+}
+
 .legal-item.is-visible {
   opacity: 0.26;
   transform: translate3d(0, 0, 0);

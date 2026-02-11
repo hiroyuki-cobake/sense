@@ -50,80 +50,127 @@ export const audioEvents = (() => {
   function step(dir, foot) {
     if (!armed) return;
 
-    // simple synthesized step: short noise burst
     const ac = audio.ac;
     if (!ac) return;
-    const n = audio.createNoise();
-    const g = ac.createGain();
+
     const t = ac.currentTime;
     const base = footGain(foot);
-
-    g.gain.setValueAtTime(0.0, t);
-    g.gain.linearRampToValueAtTime(base, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
-
-    n.connect(g);
 
     // pseudo spatial: steps orbit slightly with angle (and pinch)
     const px = Math.sin((footstepPhase += 0.6) + pinchAcc) * 0.6;
     const pz = -0.8 - (dir < 0 ? 0.15 : 0);
-    const conn = audio.connectSpatial(g, px, 0, pz);
+
+    // base noise layer (common)
+    const n = audio.createNoise();
+    const ng = ac.createGain();
+    ng.gain.setValueAtTime(0.0, t);
+    ng.gain.linearRampToValueAtTime(base * 0.85, t + 0.008);
+    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    n.connect(ng);
+    audio.connectSpatial(ng, px, 0, pz);
     n.start();
     setTimeout(() => { try { n.stop(); } catch {} }, 140);
 
-    // back step subtly increases ambience (uneasy comfort)
+    // timbre add-on
+    if (foot === "heel") {
+      // sharper click
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(220, t);
+      o.frequency.exponentialRampToValueAtTime(140, t + 0.06);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(base * 0.55, t + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+      o.connect(g);
+      audio.connectSpatial(g, px * 0.6, 0, pz);
+      o.start(t);
+      o.stop(t + 0.09);
+    }
+
+    if (foot === "zori") {
+      // soft “scrape” (bandlimited noise pulse)
+      const nz = audio.createNoise();
+      const f = ac.createBiquadFilter();
+      const g = ac.createGain();
+      f.type = "bandpass";
+      f.frequency.setValueAtTime(520, t);
+      f.Q.setValueAtTime(1.2, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(base * 0.7, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+      nz.connect(f);
+      f.connect(g);
+      audio.connectSpatial(g, px * 0.7, 0, pz);
+      nz.start();
+      setTimeout(() => { try { nz.stop(); } catch {} }, 200);
+    }
+
     if (dir < 0) layers.setAmbience(0.07);
   }
 
   function touch(hand) {
     if (!armed) return;
-    // touch = thin noise tick
+
     const ac = audio.ac;
     if (!ac) return;
+
+    const t = ac.currentTime;
+    const base = handGain(hand);
+
+    if (hand === "stick") {
+      // “kon-kon” (wood-like short resonant knock)
+      const o = ac.createOscillator();
+      const f = ac.createBiquadFilter();
+      const g = ac.createGain();
+
+      o.type = "square";
+      o.frequency.setValueAtTime(520, t);
+      o.frequency.exponentialRampToValueAtTime(260, t + 0.08);
+
+      f.type = "lowpass";
+      f.frequency.setValueAtTime(1200, t);
+      f.Q.setValueAtTime(0.9, t);
+
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(base, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+
+      o.connect(f);
+      f.connect(g);
+      audio.connectSpatial(g, 0.15, 0, -0.72);
+
+      o.start(t);
+      o.stop(t + 0.12);
+      return;
+    }
+
+    // default touch (thin noise tick)
     const n = audio.createNoise();
     const g = ac.createGain();
-    const t = ac.currentTime;
-
-    const base = handGain(hand);
     g.gain.setValueAtTime(0.0, t);
     g.gain.linearRampToValueAtTime(base, t + 0.008);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
-
     n.connect(g);
     audio.connectSpatial(g, 0.2, 0, -0.7);
     n.start();
     setTimeout(() => { try { n.stop(); } catch {} }, 80);
   }
 
-  function pinch(delta) {
-    pinchAcc += delta * 0.002;
-    pinchAcc = Math.max(-2.0, Math.min(2.0, pinchAcc));
-  }
-
-  function holdStart() { hold = true; }
-  function holdEnd() { hold = false; }
-
-  function lightTap(lightSetting) {
-    if (!armed) return;
-    if (lightSetting !== "low") return;
-    // light tap makes ambience briefly thinner
-    layers.setAmbience(0.01);
-  }
-
   function footGain(foot) {
     switch (foot) {
-      case "heel": return 0.08;
+      case "heel": return 0.09;
       case "leather": return 0.06;
-      case "shoes": return 0.045;
-      case "zori": return 0.05;
-      default: return 0.028; // none/bare
+      case "shoes": return 0.05;
+      case "zori": return 0.055;
+      default: return 0.03; // none/bare
     }
   }
 
   function handGain(hand) {
     switch (hand) {
-      case "glove": return 0.045;
-      case "stick": return 0.06;
+      case "glove": return 0.04;
+      case "stick": return 0.07;
       case "light": return 0.03;
       default: return 0.03;
     }

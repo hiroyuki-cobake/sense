@@ -57,12 +57,12 @@ export function initSettingsUI() {
     for (const opt of item.options) {
       const o = document.createElement("option");
       o.value = opt;
+      o.textContent = opt;
 
       const isHandItem = item.key === "hand";
       const isFootItem = item.key === "foot";
       const isNone = opt === "none";
 
-      // dev=1 のときは全解放（ロックしない）
       let isOwned = true;
 
       if (!DEV_UNLOCK && !isNone) {
