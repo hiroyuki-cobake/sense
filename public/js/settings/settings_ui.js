@@ -1,5 +1,5 @@
 // public/js/settings/settings_ui.js
-import { state, setSetting, saveSettings } from "../state.js";
+import { state, setSetting, saveSettings, hasItem, DEV_UNLOCK } from "../state.js";
 import { openBilling } from "../billing/stripe_client.js";
 
   const SETTINGS_CONFIG = [
@@ -62,19 +62,17 @@ export function initSettingsUI() {
       const isFootItem = item.key === "foot";
       const isNone = opt === "none";
 
+      // dev=1 のときは全解放（ロックしない）
       let isOwned = true;
 
-      if (!isNone && isHandItem) {
-        isOwned = state.owned.hand.includes(opt);
+      if (!DEV_UNLOCK && !isNone) {
+        if (isHandItem) {
+          isOwned = hasItem("hand", opt);
+        } else if (isFootItem) {
+          isOwned = hasItem("foot", opt);
+        }
       }
 
-      if (!isNone && isFootItem) {
-        isOwned = state.owned.foot.includes(opt);
-      }
-
-      o.textContent = opt;
-
-      // 未購入は選択できない（見た目もOS標準で薄くなる）
       if (!isOwned) {
         o.disabled = true;
       }
@@ -119,8 +117,8 @@ export function initSettingsUI() {
         }, 1400);
       };
 
-      if (item.key === "hand" && value !== "none") {
-        if (!state.owned.hand.includes(value)) {
+      if (!DEV_UNLOCK && item.key === "hand" && value !== "none") {
+        if (!hasItem("hand", value)) {
           showLockedPopup();
           select.value = state.settings[item.key];
           openBilling(value);
@@ -128,8 +126,8 @@ export function initSettingsUI() {
         }
       }
 
-      if (item.key === "foot" && value !== "none") {
-        if (!state.owned.foot.includes(value)) {
+      if (!DEV_UNLOCK && item.key === "foot" && value !== "none") {
+        if (!hasItem("foot", value)) {
           showLockedPopup();
           select.value = state.settings[item.key];
           openBilling(value);

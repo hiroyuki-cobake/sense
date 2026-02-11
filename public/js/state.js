@@ -3,7 +3,6 @@ const LS_SETTINGS = "sense_settings_v1";
 const LS_OWNED = "sense_owned_v1";
 const LS_DEV_UNLOCK = "sense_dev_unlock_v1";
 
-// URLクエリで「今だけ全解放」
 // ?dev=1 で有効化（端末に保存） / ?dev=0 で解除
 function getDevUnlockFlag() {
   try {
@@ -25,7 +24,7 @@ function getDevUnlockFlag() {
   }
 }
 
-const DEV_UNLOCK = getDevUnlockFlag();
+export const DEV_UNLOCK = getDevUnlockFlag();
 
 export const state = {
   owned: {
@@ -70,12 +69,8 @@ export function setSetting(key, value) {
 }
 
 export function hasItem(kind, id) {
-  // デバッグ検証用：今だけ全解放（?dev=1）
   if (DEV_UNLOCK) return true;
-
-  // "none" は常に許可（念のため）
   if (id === "none") return true;
-
   return (state.owned[kind] || []).includes(id);
 }
 
