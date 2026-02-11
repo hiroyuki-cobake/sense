@@ -1,2 +1,9 @@
+<!-- README.md -->
 # sense
-An experience that progresses solely through the senses of the sounds you hear
+
+Not a game.
+
+## Dev (Codespaces / local)
+```bash
+npm install
+npm run dev

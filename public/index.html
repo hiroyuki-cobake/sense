@@ -1,3 +1,4 @@
+<!-- public/index.html -->
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,27 +9,31 @@
     />
     <meta name="theme-color" content="#000000" />
     <title>sense</title>
+
     <link rel="manifest" href="/pwa/manifest.webmanifest" />
-    <link rel="stylesheet" href="/styles/base.css" />
-    <link rel="stylesheet" href="/styles/start.css" />
     <link rel="icon" href="/assets/icons/favicon.ico" />
     <link rel="apple-touch-icon" href="/assets/icons/favicon.ico" />
+
+    <link rel="stylesheet" href="/styles/base.css" />
+    <link rel="stylesheet" href="/styles/start.css" />
     <link rel="stylesheet" href="/styles/settings.css" />
+    <link rel="stylesheet" href="/styles/experience.css" />
+    <link rel="stylesheet" href="/styles/billing.css" />
   </head>
 
   <body>
     <main id="app" class="start">
-      <!-- ロゴ（固定：絶対に動かさない） -->
-        <div class="logo-wrap" aria-hidden="true">
+      <!-- Logo -->
+      <div class="logo-wrap" aria-hidden="true">
         <img
-            src="/assets/icons/sense_logo.png"
-            alt="sense"
-            class="logo-img"
-            draggable="false"
+          src="/assets/icons/sense_logo.png"
+          alt="sense"
+          class="logo-img"
+          draggable="false"
         />
-        </div>
+      </div>
 
-      <!-- 右下：設定（ズレる） -->
+      <!-- Gear (jitter) -->
       <button id="gearBtn" class="gear" type="button" aria-label="settings">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
@@ -37,18 +42,37 @@
         </svg>
       </button>
 
-      <!-- 下部：法務アイコン群（ランダム→無操作で全展開） -->
+      <!-- Legal dock -->
       <div id="legalDock" class="legal-dock" aria-label="legal links"></div>
+
       <!-- Settings Overlay -->
-        <div id="settingsOverlay" class="settings-overlay" hidden>
+      <div id="settingsOverlay" class="settings-overlay" hidden>
         <div class="settings-panel" id="settingsPanel">
-            <div class="settings-title">sense</div>
-
-            <div id="settingsList" class="settings-list"></div>
-
-            <button id="settingsClose" class="settings-close">close</button>
+          <div class="settings-title">sense</div>
+          <div id="settingsList" class="settings-list"></div>
+          <button id="settingsClose" class="settings-close" type="button">
+            close
+          </button>
         </div>
+      </div>
+
+      <!-- Experience Layer -->
+      <div id="experienceLayer" class="experience-layer" aria-hidden="false">
+        <canvas id="senseCanvas" class="sense-canvas"></canvas>
+      </div>
+
+      <!-- Billing Overlay -->
+      <div id="billingOverlay" class="billing-overlay" hidden>
+        <div class="billing-panel">
+          <div class="billing-title">sense</div>
+          <div id="billingBody" class="billing-body"></div>
+          <div class="billing-actions">
+            <button id="billingCancel" class="billing-btn" type="button">
+              back
+            </button>
+          </div>
         </div>
+      </div>
     </main>
 
     <script type="module" src="/js/main.js"></script>

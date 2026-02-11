@@ -1,3 +1,6 @@
+/* public/styles/settings.css */
+.settings-overlay[hidden] { display: none !important; }
+
 .settings-overlay {
   position: fixed;
   inset: 0;
@@ -10,54 +13,58 @@
 }
 
 .settings-panel {
-  width: min(92vw, 480px);
-  padding: 32px 24px 40px;
-  border-radius: 20px;
+  width: min(92vw, 520px);
+  padding: 32px 26px 36px;
+  border-radius: 22px;
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 80px rgba(0,0,0,0.65);
 }
 
 .settings-title {
   text-align: center;
-  letter-spacing: 0.2em;
-  font-size: 18px;
-  margin-bottom: 28px;
-  opacity: 0.8;
+  letter-spacing: 0.35em;
+  font-size: 16px;
+  margin-bottom: 26px;
+  opacity: 0.55;
+  font-weight: 200;
 }
 
 .settings-list {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
 .setting-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
-  letter-spacing: 0.06em;
-  opacity: 0.85;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  opacity: 0.75;
 }
 
 .setting-select {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.8);
-  padding: 6px 10px;
-  border-radius: 12px;
-  font-size: 13px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.62);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.08em;
 }
 
 .settings-close {
-  margin-top: 30px;
+  margin-top: 22px;
   width: 100%;
   padding: 10px 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  opacity: 0.6;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  opacity: 0.5;
 }
-
-.settings-overlay[hidden] { display: none !important; }
