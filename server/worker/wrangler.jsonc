@@ -1,5 +1,15 @@
 {
   "name": "sense-worker",
   "main": "index.js",
-  "compatibility_date": "2026-02-11"
+  "compatibility_date": "2026-02-11",
+  "vars": {
+    "STRIPE_API_VERSION": "2023-10-16"
+  },
+  "preview_urls": true,
+  "observability": {
+    "enabled": false,
+    "logs": {
+      "enabled": false
+    }
+  }
 }
