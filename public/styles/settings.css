@@ -1,0 +1,63 @@
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.94);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.settings-panel {
+  width: min(92vw, 480px);
+  padding: 32px 24px 40px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+}
+
+.settings-title {
+  text-align: center;
+  letter-spacing: 0.2em;
+  font-size: 18px;
+  margin-bottom: 28px;
+  opacity: 0.8;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.setting-select {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.settings-close {
+  margin-top: 30px;
+  width: 100%;
+  padding: 10px 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
+.settings-overlay[hidden] { display: none !important; }

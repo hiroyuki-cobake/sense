@@ -1,0 +1,122 @@
+/* start page layout */
+.start {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ロゴ */
+.logo-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 43%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.logo-img {
+  width: clamp(240px, 70vw, 300px);
+  height: auto;
+  opacity: 0.92;
+
+  /* わずかな発光で存在感だけ出す */
+  filter:
+    drop-shadow(0 0 14px rgba(255, 255, 255, 0.18))
+    drop-shadow(0 0 48px rgba(255, 255, 255, 0.06));
+
+  pointer-events: none;
+}
+
+/* 右下：歯車 */
+.gear {
+  position: absolute;
+  right: calc(18px + var(--safe-r));
+  bottom: calc(14px + var(--safe-b));
+  width: var(--tap);
+  height: var(--tap);
+  display: grid;
+  place-items: center;
+  opacity: 0.35;
+  cursor: pointer;
+}
+
+.gear svg {
+  width: 22px;
+  height: 22px;
+  fill: rgba(255, 255, 255, 0.72);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.08));
+}
+
+.gear:active {
+  opacity: 0.6;
+}
+
+/* 下部：法務アイコン（見た目は薄いが押しやすい） */
+.legal-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(10px + var(--safe-b));
+  height: 92px;
+  pointer-events: none; /* 子要素だけ有効 */
+}
+
+.legal-item {
+  position: absolute;
+  pointer-events: auto;
+
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 10px 12px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  border-radius: 999px;
+
+  /* 背景はほぼ無し（“そこにある気配”だけ） */
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(2px);
+
+  opacity: 0.0;
+  transform: translate3d(0, 6px, 0);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+.legal-item.is-visible {
+  opacity: 0.28;
+  transform: translate3d(0, 0, 0);
+}
+
+.legal-item:active {
+  opacity: 0.5;
+}
+
+.legal-label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+
+/* アイコンは “線” っぽく薄く */
+.legal-icon {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.05));
+}
+
+.legal-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: rgba(255, 255, 255, 0.7);
+}

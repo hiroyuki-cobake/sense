@@ -1,0 +1,12 @@
+{
+  "name": "sense",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "sense",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "postCreateCommand": "npm ci || npm install"
+}
