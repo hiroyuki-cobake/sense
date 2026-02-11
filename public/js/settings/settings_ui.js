@@ -1,5 +1,6 @@
 // public/js/settings/settings_ui.js
 import { state, setSetting, saveSettings } from "../state.js";
+import { openBilling } from "../billing/stripe_client.js";
 
   const SETTINGS_CONFIG = [
     { key: "sound", label: "sound field", options: ["spatial", "mono", "none"] },
@@ -56,7 +57,28 @@ export function initSettingsUI() {
     for (const opt of item.options) {
       const o = document.createElement("option");
       o.value = opt;
+
+      const isHandItem = item.key === "hand";
+      const isFootItem = item.key === "foot";
+      const isNone = opt === "none";
+
+      let isOwned = true;
+
+      if (!isNone && isHandItem) {
+        isOwned = state.owned.hand.includes(opt);
+      }
+
+      if (!isNone && isFootItem) {
+        isOwned = state.owned.foot.includes(opt);
+      }
+
       o.textContent = opt;
+
+      // 未購入は選択できない（見た目もOS標準で薄くなる）
+      if (!isOwned) {
+        o.disabled = true;
+      }
+
       if (state.settings[item.key] === opt) o.selected = true;
       select.appendChild(o);
     }
@@ -64,18 +86,53 @@ export function initSettingsUI() {
     select.addEventListener("change", (e) => {
       const value = e.target.value;
 
+      const showLockedPopup = () => {
+        let popup = document.getElementById("lockedPopup");
+
+        if (!popup) {
+          popup = document.createElement("div");
+          popup.id = "lockedPopup";
+          popup.style.position = "fixed";
+          popup.style.top = "50%";
+          popup.style.left = "50%";
+          popup.style.transform = "translate(-50%, -50%)";
+          popup.style.padding = "18px 28px";
+          popup.style.background = "rgba(0,0,0,.92)";
+          popup.style.border = "1px solid rgba(255,0,0,.4)";
+          popup.style.borderRadius = "12px";
+          popup.style.color = "rgba(255,80,80,.9)";
+          popup.style.fontSize = "14px";
+          popup.style.letterSpacing = ".18em";
+          popup.style.zIndex = "99999";
+          popup.style.backdropFilter = "blur(8px)";
+          popup.style.textAlign = "center";
+          popup.style.pointerEvents = "none";
+          document.body.appendChild(popup);
+        }
+
+        popup.textContent = "購入していないので使えません";
+
+        popup.style.opacity = "1";
+
+        setTimeout(() => {
+          popup.style.opacity = "0";
+        }, 1400);
+      };
+
       if (item.key === "hand" && value !== "none") {
         if (!state.owned.hand.includes(value)) {
-          alert("You need to purchase this item before using it.");
+          showLockedPopup();
           select.value = state.settings[item.key];
+          openBilling(value);
           return;
         }
       }
 
       if (item.key === "foot" && value !== "none") {
         if (!state.owned.foot.includes(value)) {
-          alert("You need to purchase this item before using it.");
+          showLockedPopup();
           select.value = state.settings[item.key];
+          openBilling(value);
           return;
         }
       }

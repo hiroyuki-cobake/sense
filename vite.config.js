@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   root: "public",
-  base: "./",
+  base: "/",
 
   server: {
     host: true,
@@ -18,14 +18,14 @@ export default defineConfig({
   },
 
   build: {
-    outDir: "../docs",
+    outDir: "dist",
     emptyOutDir: true,
-rollupOptions: {
-  input: {
-    main: "./public/index.html",
-    transactions: "./public/legal/transactions.html",
-    terms: "./public/legal/terms_of_service.html",
-    privacy: "./public/legal/privacy_policy.html"
+    rollupOptions: {
+      input: {
+        main: "./public/index.html",
+        transactions: "./public/legal/transactions.html",
+        terms: "./public/legal/terms_of_service.html",
+        privacy: "./public/legal/privacy_policy.html"
       }
     }
   }
