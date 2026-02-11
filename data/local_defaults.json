@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "events": {
+    "idle_min_ms": 5000,
+    "idle_max_ms": 45000
+  }
+}
