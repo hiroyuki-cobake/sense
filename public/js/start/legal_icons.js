@@ -5,204 +5,70 @@ const LEGAL_ITEMS = [
   { id: "legal-3", label: "privacy", href: "legal/privacy_policy.html", icon: "shield" },
 ];
 
-const REVEAL_MIN = 7000;
-const REVEAL_MAX = 18000;
-const HOLD_ALL_MS = 5200;
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
 
-function rand(min, max) { return Math.random() * (max - min) + min; }
-function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
-function calcWeirdPositions(count) {
+function footerPositions(count) {
   const w = window.innerWidth;
   const h = window.innerHeight;
+
   const bandTop = h * 0.82;
   const bandBottom = h * 0.94;
-  const minX = 24;
-  const maxX = Math.max(minX, w - 24);
 
-  const baseX = rand(minX + 20, maxX - 20);
-  const baseY = rand(bandTop, bandBottom);
+  const margin = 40;
+  const usable = w - margin * 2;
+  const gap = usable / count;
 
   const positions = [];
+
   for (let i = 0; i < count; i++) {
-    const dx = rand(-80, 80) + i * rand(34, 62);
-    const dy = rand(-18, 18);
+    const x = margin + gap * i + gap * 0.5;
+    const y = bandTop + Math.random() * (bandBottom - bandTop);
+
     positions.push({
-      x: clamp(baseX + dx, minX, maxX),
-      y: clamp(baseY + dy, bandTop, bandBottom),
+      x: clamp(x, margin, w - margin),
+      y: clamp(y, bandTop, bandBottom)
     });
   }
+
   return positions;
 }
 
-function iconSvg(kind) {
-  if (kind === "doc") {
-    return `<svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6V2zm8 1.5V7h3.5L14 3.5zM8 11h8v1.6H8V11zm0 4h8v1.6H8V15z"/></svg>`;
-  }
-  if (kind === "shield") {
-    return `<svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.2-3.4 9.9-8 10-4.6-.1-8-4.8-8-10V6l8-4zm0 2.2L6 7v5c0 4.2 2.6 8 6 8 3.4 0 6-3.8 6-8V7l-6-2.8z"/></svg>`;
-  }
-  return `<svg viewBox="0 0 24 24"><path d="M10.6 13.4a1 1 0 0 1 0-1.4l3-3a1 1 0 1 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0zM7 17a4 4 0 0 1 0-5.7l2-2A4 4 0 0 1 14.7 9a1 1 0 1 1-1.4 1.4 2 2 0 0 0-2.8 0l-2 2A2 2 0 1 0 11.3 15a1 1 0 1 1 1.4 1.4A4 4 0 0 1 7 17zm10-10a4 4 0 0 1 0 5.7l-2 2A4 4 0 0 1 9.3 15a1 1 0 1 1 1.4-1.4 2 2 0 0 0 2.8 0l2-2A2 2 0 1 0 12.7 9a1 1 0 1 1-1.4-1.4A4 4 0 0 1 17 7z"/></svg>`;
-}
-
-function resolveFromSenseRoot(relativePath) {
-  const origin = window.location.origin;
-
-  const hasBuiltAssetsScript = Array.from(document.scripts).some((s) => {
-    const src = s && s.src ? s.src : "";
-    return src.includes("/assets/");
-  });
-
-  const path = window.location.pathname;
-  const idx = path.indexOf("/sense/");
-
-  const basePath = hasBuiltAssetsScript && idx >= 0
-    ? path.slice(0, idx + "/sense/".length)
-    : "/";
-
-  return new URL(relativePath, `${origin}${basePath}`).toString();
+function resolvePath(path) {
+  return new URL(path, window.location.origin).toString();
 }
 
 function openLegalModal(url) {
   const modal = document.getElementById("legalModal");
   const frame = document.getElementById("legalFrame");
-  const closeBtn = document.getElementById("legalModalClose");
 
-  if (!modal || !frame || !closeBtn) {
-    window.location.href = url;
-    return;
-  }
-
-  frame.setAttribute("src", url);
+  frame.src = resolvePath(url);
   modal.hidden = false;
-
-  const close = () => {
-    modal.hidden = true;
-    frame.removeAttribute("src");
-    modal.removeEventListener("click", onBackdrop);
-    closeBtn.removeEventListener("click", close);
-    document.removeEventListener("keydown", onKeydown);
-  };
-
-  const onBackdrop = (e) => {
-    if (e.target === modal) close();
-  };
-
-  const onKeydown = (e) => {
-    if (e.key === "Escape") close();
-  };
-
-  modal.addEventListener("click", onBackdrop);
-  closeBtn.addEventListener("click", close);
-  document.addEventListener("keydown", onKeydown);
-}
-
-function createLegalEl(item) {
-  const a = document.createElement("a");
-  a.className = "legal-item";
-
-  const absUrl = resolveFromSenseRoot(item.href);
-  a.href = absUrl;
-
-  a.target = "_self";
-  a.rel = "noopener noreferrer";
-  a.dataset.id = item.id;
-  a.innerHTML = `<span class="legal-icon">${iconSvg(item.icon)}</span><span class="legal-label">${item.label}</span>`;
-
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openLegalModal(absUrl);
-  });
-
-  return a;
-}
-
-function pickRandomSubset(allItems) {
-  const n = randInt(1, 3);
-  const shuffled = [...allItems].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, n);
 }
 
 export function initLegalIcons({ dockEl }) {
   if (!dockEl) return;
 
   dockEl.innerHTML = "";
-  const els = new Map();
-  for (const item of LEGAL_ITEMS) {
-    const el = createLegalEl(item);
-    els.set(item.id, el);
-    dockEl.appendChild(el);
-  }
 
-  let visibleIds = new Set();
-  let revealTimer = null;
-  let holdAllUntil = 0;
+  const positions = footerPositions(LEGAL_ITEMS.length);
 
-  const applyPositions = () => {
-    const vis = [...visibleIds];
-    const positions = calcWeirdPositions(vis.length);
-    vis.forEach((id, idx) => {
-      const el = els.get(id);
-      if (!el) return;
-      el.style.left = `${positions[idx].x}px`;
-      el.style.top = `${positions[idx].y}px`;
+  LEGAL_ITEMS.forEach((item, i) => {
+    const a = document.createElement("a");
+    a.className = "legal-item is-visible";
+    a.href = "#";
+    a.innerHTML = `<span class="legal-label">${item.label}</span>`;
+
+    a.style.left = `${positions[i].x}px`;
+    a.style.top = `${positions[i].y}px`;
+
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openLegalModal(item.href);
     });
-  };
 
-  const setVisible = (id, on) => {
-    const el = els.get(id);
-    if (!el) return;
-    el.classList.toggle("is-visible", !!on);
-  };
-
-  const showSubset = (subsetIds) => {
-    visibleIds = new Set(subsetIds);
-    for (const item of LEGAL_ITEMS) setVisible(item.id, visibleIds.has(item.id));
-    applyPositions();
-  };
-
-  const scheduleRevealMissing = () => {
-    if (revealTimer) clearTimeout(revealTimer);
-
-    const tick = () => {
-      const now = Date.now();
-      if (now < holdAllUntil) {
-        revealTimer = setTimeout(tick, 900);
-        return;
-      }
-
-      const missing = LEGAL_ITEMS.map(x => x.id).filter(id => !visibleIds.has(id));
-      if (missing.length === 0) return;
-
-      visibleIds.add(missing[0]);
-      setVisible(missing[0], true);
-      applyPositions();
-
-      const allNow = LEGAL_ITEMS.every(x => visibleIds.has(x.id));
-      if (allNow) holdAllUntil = Date.now() + HOLD_ALL_MS;
-
-      revealTimer = setTimeout(tick, randInt(REVEAL_MIN, REVEAL_MAX));
-    };
-
-    revealTimer = setTimeout(tick, randInt(REVEAL_MIN, REVEAL_MAX));
-  };
-
-  const randomizeInitial = () => {
-    const subset = pickRandomSubset(LEGAL_ITEMS);
-    showSubset(subset.map(x => x.id));
-    scheduleRevealMissing();
-  };
-
-  const resetByInteraction = () => {
-    if (Date.now() < holdAllUntil) return;
-    randomizeInitial();
-  };
-
-  window.addEventListener("pointerdown", resetByInteraction, { passive: true });
-  window.addEventListener("wheel", resetByInteraction, { passive: true });
-  window.addEventListener("resize", applyPositions, { passive: true });
-
-  randomizeInitial();
+    dockEl.appendChild(a);
+  });
 }

@@ -53,9 +53,9 @@
 .legal-dock {
   position: fixed;
   left: 0;
-  top: 0;
+  bottom: 0;
   width: 100%;
-  height: 100%;
+  height: 18vh;
   pointer-events: none;
   z-index: 20;
 }
@@ -89,10 +89,13 @@
 .legal-item:active { opacity: 0.48; }
 
 .legal-label {
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.68);
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: .25em;
+  color: rgba(255,255,255,.42);
   white-space: nowrap;
+  text-transform: lowercase;
 }
 
 .legal-icon {
