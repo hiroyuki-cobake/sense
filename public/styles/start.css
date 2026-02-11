@@ -15,7 +15,16 @@
   transform: translateY(-50%);
   display: grid;
   place-items: center;
-  pointer-events: none;
+
+  /* ここを変更：ロゴをタップ可能にする */
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+
+  /* 追加：開始時のフェード制御 */
+  opacity: 1;
+transition: opacity 2600ms cubic-bezier(.12,.02,.08,1), filter 2600ms cubic-bezier(.12,.02,.08,1);
+will-change: opacity, filter;
 }
 
 .logo-img {
@@ -26,6 +35,15 @@
     drop-shadow(0 0 14px rgba(255, 255, 255, 0.18))
     drop-shadow(0 0 48px rgba(255, 255, 255, 0.06));
   pointer-events: none;
+}
+
+/* 追加：start解除されたらロゴを消す */
+#app:not(.start) .logo-wrap {
+  opacity: 0;
+  pointer-events: none;
+
+  /* “気配が抜ける”感じの薄い不穏さ */
+  filter: blur(6px) brightness(0.75);
 }
 
 .gear {
@@ -178,4 +196,12 @@
   height: 100%;
   border: 0;
   background: transparent;
+}
+
+/* 体験開始後は、特商法アイコン群を隠す（設定ボタンは残す） */
+#app:not(.start) .legal-dock {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translate3d(0, 10px, 0);
+  transition: opacity 800ms cubic-bezier(.12,.02,.08,1), transform 800ms cubic-bezier(.12,.02,.08,1);
 }

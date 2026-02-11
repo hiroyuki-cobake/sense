@@ -2,7 +2,11 @@
 import { loadState } from "./state.js";
 import { initLegalIcons } from "./start/legal_icons.js";
 import { initGearJitter } from "./start/gear_jitter.js";
-import { initSettingsUI, openSettings, closeSettings } from "./settings/settings_ui.js";
+import {
+  initSettingsUI,
+  openSettings,
+  closeSettings,
+} from "./settings/settings_ui.js";
 import { initExperience } from "./experience/progression.js";
 import { initBillingUI } from "./billing/billing_ui.js";
 
@@ -21,6 +25,15 @@ function boot() {
     openSettings();
   });
 
+  // 初回の音解放用（iOS/WebAudio）
+  const unlock = () => {
+    document.removeEventListener("pointerdown", unlock, true);
+    document.removeEventListener("touchstart", unlock, true);
+    window.dispatchEvent(new Event("sense-unlock-audio"));
+  };
+  document.addEventListener("pointerdown", unlock, true);
+  document.addEventListener("touchstart", unlock, true);
+
   // ===== START CONTROL =====
   const app = document.getElementById("app");
   const logoWrap = document.querySelector(".logo-wrap");
@@ -33,32 +46,45 @@ function boot() {
 
     app.classList.remove("start");
 
+    // 体験初期化は「開始時」に行う
     initExperience();
 
+    // 念のため開始時にも音解放イベントを投げる
     window.dispatchEvent(new Event("sense-unlock-audio"));
   }
 
-  // PCダブルクリック
-  logoWrap.addEventListener("dblclick", startExperience);
+  // ---- Robust double-tap / double-click detection (pointer-based) ----
+  // ここでCSSがpointer-events: noneでも拾える確率を上げる（最小限の上書き）
+  if (logoWrap) {
+    logoWrap.style.pointerEvents = "auto";
+    logoWrap.style.touchAction = "manipulation"; // iOSのダブルタップズーム抑制
+    logoWrap.style.cursor = "pointer";
+  }
 
-  // モバイルダブルタップ
-  let lastTap = 0;
-  logoWrap.addEventListener("touchend", (e) => {
-    const now = new Date().getTime();
-    if (now - lastTap < 300) {
+  let lastPointerUpAt = 0;
+  const DOUBLE_TAP_MS = 320;
+
+  const onLogoPointerUp = (e) => {
+    // ロゴ以外から来たら無視
+    if (!e.target || !e.target.closest(".logo-wrap")) return;
+
+    const now = performance.now();
+    const dt = now - lastPointerUpAt;
+    lastPointerUpAt = now;
+
+    if (dt > 0 && dt < DOUBLE_TAP_MS) {
       startExperience();
     }
-    lastTap = now;
-  });
-
-  // 初回の音解放用（保険）
-  const unlock = () => {
-    document.removeEventListener("pointerdown", unlock, true);
-    document.removeEventListener("touchstart", unlock, true);
-    window.dispatchEvent(new Event("sense-unlock-audio"));
   };
-  document.addEventListener("pointerdown", unlock, true);
-  document.addEventListener("touchstart", unlock, true);
+
+  // logoWrapに直接付ける（基本）
+  if (logoWrap) {
+    logoWrap.addEventListener("pointerup", onLogoPointerUp, { passive: true });
+  }
+
+  // さらに保険：もしlogoWrapがクリックを受け取れないCSS状態でも
+  // ルート(app)側で拾えるようにする（イベントが来る場合のみ有効）
+  app.addEventListener("pointerup", onLogoPointerUp, { passive: true });
 }
 
 boot();
