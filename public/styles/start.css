@@ -19,7 +19,7 @@
 }
 
 .logo-img {
-  width: clamp(240px, 70vw, 680px);
+  width: clamp(240px, 70vw, 350px);
   height: auto;
   opacity: 0.92;
   filter:
@@ -56,8 +56,8 @@
   right: 0;
   bottom: calc(10px + var(--safe-b));
   height: 96px;
-  pointer-events: none;
-  z-index: 4;
+  pointer-events: auto;
+  z-index: 20;
 }
 
 .legal-item {
@@ -113,3 +113,7 @@
 .logo-wrap { z-index: 3; }
 .legal-dock { z-index: 4; }
 .gear { z-index: 5; }
+
+.experience-layer{
+  z-index: 0;
+}

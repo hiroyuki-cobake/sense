@@ -13,7 +13,6 @@
     <link rel="manifest" href="./pwa/manifest.webmanifest" />
     <link rel="icon" href="./assets/icons/favicon.ico" />
     <link rel="apple-touch-icon" href="./assets/icons/favicon.ico" />
-
     <link rel="stylesheet" href="./styles/base.css" />
     <link rel="stylesheet" href="./styles/start.css" />
     <link rel="stylesheet" href="./styles/settings.css" />
@@ -26,7 +25,7 @@
       <!-- Logo -->
       <div class="logo-wrap" aria-hidden="true">
         <img
-          src="/assets/icons/sense_logo.png"
+          src="./assets/icons/sense_logo.png"
           alt="sense"
           class="logo-img"
           draggable="false"
@@ -61,6 +60,16 @@
         <canvas id="senseCanvas" class="sense-canvas"></canvas>
       </div>
 
+      <!-- Operation Overlay -->
+      <div id="operationOverlay" class="operation-overlay" hidden>
+        <img
+          src="./assets/icons/operation.png"
+          alt="operation"
+          class="operation-img"
+          draggable="false"
+        />
+      </div>
+
       <!-- Billing Overlay -->
       <div id="billingOverlay" class="billing-overlay" hidden>
         <div class="billing-panel">
@@ -75,6 +84,6 @@
       </div>
     </main>
 
-    <script type="module" src="/js/main.js"></script>
+    <script type="module" src="./js/main.js"></script>
   </body>
 </html>
