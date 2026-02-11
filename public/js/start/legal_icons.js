@@ -1,8 +1,8 @@
 // public/js/start/legal_icons.js
 const LEGAL_ITEMS = [
-  { id: "legal-1", label: "特商法", href: "https://puzzle.cobake.co/", icon: "doc" },
-  { id: "legal-2", label: "利用規約", href: "https://puzzle.cobake.co/", icon: "link" },
-  { id: "legal-3", label: "プライバシー", href: "https://puzzle.cobake.co/", icon: "shield" },
+  { id: "legal-1", label: "特商法", href: "./legal/transactions.html", icon: "doc" },
+  { id: "legal-2", label: "利用規約", href: "./legal/terms_of_service.html", icon: "link" },
+  { id: "legal-3", label: "プライバシー", href: "./legal/privacy_policy.html", icon: "shield" },
 ];
 
 const REVEAL_MIN = 7000;
