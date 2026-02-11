@@ -1,9 +1,8 @@
-/* public/styles/experience.css */
 .experience-layer{
   position:absolute;
   inset:0;
-  z-index:1;
-  pointer-events:auto;
+  z-index:0;            /* 背面 */
+  pointer-events:none;  /* UIを邪魔しない */
 }
 
 .sense-canvas{

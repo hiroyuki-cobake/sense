@@ -109,3 +109,7 @@
   height: 18px;
   fill: rgba(255, 255, 255, 0.7);
 }
+
+.logo-wrap { z-index: 3; }
+.legal-dock { z-index: 4; }
+.gear { z-index: 5; }

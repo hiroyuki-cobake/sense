@@ -68,3 +68,24 @@
   letter-spacing: 0.2em;
   opacity: 0.5;
 }
+
+.operation-overlay[hidden]{ display:none !important; }
+
+.operation-overlay{
+  position:fixed;
+  inset:0;
+  z-index:70;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(6px);
+  display:grid;
+  place-items:center;
+}
+
+.operation-img{
+  width: min(92vw, 560px);
+  height: auto;
+  opacity: 0.85;
+  filter:
+    drop-shadow(0 0 18px rgba(255,255,255,0.10))
+    drop-shadow(0 0 60px rgba(255,255,255,0.05));
+}
