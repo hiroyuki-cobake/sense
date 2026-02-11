@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <title>sense</title>
+    <link rel="manifest" href="/sense/assets/manifest-B_SY1GJM.webmanifest" />
+    <link rel="icon" href="/sense/assets/favicon-7S5W1WXa.ico" />
+    <link rel="apple-touch-icon" href="/sense/assets/favicon-7S5W1WXa.ico" />
+    <script type="module" crossorigin src="/sense/assets/index-U3J6ixpY.js"></script>
+    <link rel="stylesheet" crossorigin href="/sense/assets/index-CGvKV6o6.css">
+  </head>
+
+  <body>
+    <main id="app" class="start">
+      <!-- ロゴ（固定：絶対に動かさない） -->
+        <div class="logo-wrap" aria-hidden="true">
+        <img
+            src="/sense/assets/sense_logo-BpFW0OBl.png"
+            alt="sense"
+            class="logo-img"
+            draggable="false"
+        />
+        </div>
+
+      <!-- 右下：設定（ズレる） -->
+      <button id="gearBtn" class="gear" type="button" aria-label="settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.5 7.5 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 1h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.58.23-1.12.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 7.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.4 1.05.71 1.63.94l.36 2.54c.04.24.25.42.49.42h3.8c.24 0 .45-.18.49-.42l.36-2.54c.58-.23 1.12-.54 1.63-.94l2.39.96c.22.09.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"
+          />
+        </svg>
+      </button>
+
+      <!-- 下部：法務アイコン群（ランダム→無操作で全展開） -->
+      <div id="legalDock" class="legal-dock" aria-label="legal links"></div>
+      <!-- Settings Overlay -->
+        <div id="settingsOverlay" class="settings-overlay" hidden>
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-title">sense</div>
+
+            <div id="settingsList" class="settings-list"></div>
+
+            <button id="settingsClose" class="settings-close">close</button>
+        </div>
+        </div>
+    </main>
+
+  </body>
+</html>
