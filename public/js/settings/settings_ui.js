@@ -2,7 +2,7 @@
 import { state, setSetting, saveSettings } from "../state.js";
 
   const SETTINGS_CONFIG = [
-    { key: "sound", label: "sound field", options: ["spatial", "mono"] },
+    { key: "sound", label: "sound field", options: ["spatial", "mono", "none"] },
     { key: "light", label: "light", options: ["off", "low"] },
     { key: "pulse", label: "pulse", options: ["low", "normal", "high"] },
     { key: "hand", label: "bring what you have (hand)", options: ["none", "stick", "light", "glove"] },

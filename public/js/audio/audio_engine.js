@@ -33,6 +33,13 @@ export const audio = (() => {
 
   function setMode(nextMode) {
     mode = nextMode;
+    if (!master) return;
+
+    if (mode === "none") {
+      master.gain.value = 0;
+    } else {
+      master.gain.value = 0.65;
+    }
   }
 
   function now() {
