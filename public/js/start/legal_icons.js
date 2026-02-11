@@ -1,8 +1,8 @@
 // public/js/start/legal_icons.js
 const LEGAL_ITEMS = [
-  { id: "legal-1", label: "特商法", href: "./legal/transactions.html", icon: "doc" },
-  { id: "legal-2", label: "利用規約", href: "./legal/terms_of_service.html", icon: "link" },
-  { id: "legal-3", label: "プライバシー", href: "./legal/privacy_policy.html", icon: "shield" },
+  { id: "legal-1", label: "transactions", href: "legal/transactions.html", icon: "doc" },
+  { id: "legal-2", label: "service", href: "legal/terms_of_service.html", icon: "link" },
+  { id: "legal-3", label: "privacy", href: "legal/privacy_policy.html", icon: "shield" },
 ];
 
 const REVEAL_MIN = 7000;
@@ -46,14 +46,76 @@ function iconSvg(kind) {
   return `<svg viewBox="0 0 24 24"><path d="M10.6 13.4a1 1 0 0 1 0-1.4l3-3a1 1 0 1 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0zM7 17a4 4 0 0 1 0-5.7l2-2A4 4 0 0 1 14.7 9a1 1 0 1 1-1.4 1.4 2 2 0 0 0-2.8 0l-2 2A2 2 0 1 0 11.3 15a1 1 0 1 1 1.4 1.4A4 4 0 0 1 7 17zm10-10a4 4 0 0 1 0 5.7l-2 2A4 4 0 0 1 9.3 15a1 1 0 1 1 1.4-1.4 2 2 0 0 0 2.8 0l2-2A2 2 0 1 0 12.7 9a1 1 0 1 1-1.4-1.4A4 4 0 0 1 17 7z"/></svg>`;
 }
 
+function resolveFromSenseRoot(relativePath) {
+  const origin = window.location.origin;
+
+  const hasBuiltAssetsScript = Array.from(document.scripts).some((s) => {
+    const src = s && s.src ? s.src : "";
+    return src.includes("/assets/");
+  });
+
+  const path = window.location.pathname;
+  const idx = path.indexOf("/sense/");
+
+  const basePath = hasBuiltAssetsScript && idx >= 0
+    ? path.slice(0, idx + "/sense/".length)
+    : "/";
+
+  return new URL(relativePath, `${origin}${basePath}`).toString();
+}
+
+function openLegalModal(url) {
+  const modal = document.getElementById("legalModal");
+  const frame = document.getElementById("legalFrame");
+  const closeBtn = document.getElementById("legalModalClose");
+
+  if (!modal || !frame || !closeBtn) {
+    window.location.href = url;
+    return;
+  }
+
+  frame.setAttribute("src", url);
+  modal.hidden = false;
+
+  const close = () => {
+    modal.hidden = true;
+    frame.removeAttribute("src");
+    modal.removeEventListener("click", onBackdrop);
+    closeBtn.removeEventListener("click", close);
+    document.removeEventListener("keydown", onKeydown);
+  };
+
+  const onBackdrop = (e) => {
+    if (e.target === modal) close();
+  };
+
+  const onKeydown = (e) => {
+    if (e.key === "Escape") close();
+  };
+
+  modal.addEventListener("click", onBackdrop);
+  closeBtn.addEventListener("click", close);
+  document.addEventListener("keydown", onKeydown);
+}
+
 function createLegalEl(item) {
   const a = document.createElement("a");
   a.className = "legal-item";
-  a.href = item.href;
-  a.target = "_blank";
+
+  const absUrl = resolveFromSenseRoot(item.href);
+  a.href = absUrl;
+
+  a.target = "_self";
   a.rel = "noopener noreferrer";
   a.dataset.id = item.id;
   a.innerHTML = `<span class="legal-icon">${iconSvg(item.icon)}</span><span class="legal-label">${item.label}</span>`;
+
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openLegalModal(absUrl);
+  });
+
   return a;
 }
 
@@ -128,9 +190,8 @@ export function initLegalIcons({ dockEl }) {
   };
 
   const randomizeInitial = () => {
-    const allIds = LEGAL_ITEMS.map(x => x.id);
-    showSubset(allIds);
-    holdAllUntil = Date.now() + HOLD_ALL_MS;
+    const subset = pickRandomSubset(LEGAL_ITEMS);
+    showSubset(subset.map(x => x.id));
     scheduleRevealMissing();
   };
 
@@ -140,7 +201,6 @@ export function initLegalIcons({ dockEl }) {
   };
 
   window.addEventListener("pointerdown", resetByInteraction, { passive: true });
-  window.addEventListener("pointermove", resetByInteraction, { passive: true });
   window.addEventListener("wheel", resetByInteraction, { passive: true });
   window.addEventListener("resize", applyPositions, { passive: true });
 

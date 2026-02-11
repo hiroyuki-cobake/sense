@@ -117,3 +117,62 @@
 .experience-layer{
   z-index: 0;
 }
+
+/* Legal Modal */
+.legal-modal[hidden]{
+  display: none !important;
+}
+
+.legal-modal{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: calc(16px + var(--safe-t)) calc(16px + var(--safe-r)) calc(16px + var(--safe-b)) calc(16px + var(--safe-l));
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(14px);
+  pointer-events: auto;
+}
+
+.legal-modal-panel{
+  width: min(920px, 100%);
+  height: min(720px, 100%);
+  border-radius: 18px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 24px 70px rgba(0,0,0,.55);
+  overflow: hidden;
+  position: relative;
+}
+
+.legal-modal-close{
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(255,255,255,.28);
+  font-size: 11px;
+  letter-spacing: .35em;
+  text-transform: lowercase;
+  cursor: pointer;
+  z-index: 2;
+  transition: opacity 200ms ease, color 200ms ease;
+}
+
+.legal-modal-close:hover{
+  color: rgba(255,255,255,.5);
+}
+
+.legal-modal-close:active{
+  opacity: .4;
+}
+
+.legal-frame{
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
