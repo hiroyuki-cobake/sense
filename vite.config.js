@@ -20,5 +20,8 @@ export default defineConfig({
   build: {
     outDir: "../docs",
     emptyOutDir: true,
+    rollupOptions: {
+      input: "./public/index.html"
+    }
   },
 });
