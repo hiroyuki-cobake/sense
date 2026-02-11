@@ -20,8 +20,13 @@ export default defineConfig({
   build: {
     outDir: "../docs",
     emptyOutDir: true,
-    rollupOptions: {
-      input: "./public/index.html"
+rollupOptions: {
+  input: {
+    main: "./public/index.html",
+    transactions: "./public/legal/transactions.html",
+    terms: "./public/legal/terms_of_service.html",
+    privacy: "./public/legal/privacy_policy.html"
+      }
     }
-  },
+  }
 });
