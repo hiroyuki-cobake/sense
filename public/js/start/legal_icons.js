@@ -128,8 +128,9 @@ export function initLegalIcons({ dockEl }) {
   };
 
   const randomizeInitial = () => {
-    const subset = pickRandomSubset(LEGAL_ITEMS);
-    showSubset(subset.map(x => x.id));
+    const allIds = LEGAL_ITEMS.map(x => x.id);
+    showSubset(allIds);
+    holdAllUntil = Date.now() + HOLD_ALL_MS;
     scheduleRevealMissing();
   };
 
