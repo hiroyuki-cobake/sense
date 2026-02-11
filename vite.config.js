@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   root: "public",
-  base: "/sense/",
+  base: "./",
 
   server: {
     host: true,
