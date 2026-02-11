@@ -55,7 +55,7 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 18vh;
+  height: 120px;
   pointer-events: none;
   z-index: 20;
 }
@@ -64,17 +64,17 @@
   position: absolute;
   pointer-events: auto;
 
-  min-width: var(--tap);
+  min-width: 0;
   min-height: var(--tap);
-  padding: 10px 12px;
+  padding: 0;
 
   display: inline-flex;
   align-items: center;
   gap: 10px;
 
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(2px);
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
 
   opacity: 0;
   transform: translate3d(0, 6px, 0);
