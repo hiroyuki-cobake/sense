@@ -113,11 +113,12 @@ will-change: opacity, filter;
 #app.start .legal-dock {
   opacity: 1 !important;
   transform: none !important;
-  pointer-events: auto !important;
 }
 
-#app.start .legal-item.is-visible {
+/* is-visible が付かなくても表示する */
+#app.start .legal-item {
   opacity: 0.45 !important;
+  transform: translate3d(0, 0, 0) !important;
   pointer-events: auto !important;
 }
 

@@ -51,13 +51,11 @@ export function initExperience() {
       audioEvents.pinch(d);
     },
     onTapSpot: (x, y) => {
-      // light item: only if selected & owned
       light.tapSpot(x, y, state.settings.light, state.settings.hand);
       audioEvents.lightTap(state.settings.light);
     },
   });
 
-  // Audio unlock hook
   window.addEventListener("sense-unlock-audio", () => {
     audio.ensureStarted(state.settings.sound);
     audioEvents.boot();
@@ -75,14 +73,12 @@ export function initExperience() {
 }
 
 function render(ctx, w, h, idleMs, angle, light) {
-  // near-black field with barely visible gradient
   const g = ctx.createRadialGradient(w * 0.5, h * 0.55, 0, w * 0.5, h * 0.55, Math.max(w, h) * 0.7);
   g.addColorStop(0, "rgb(5,5,5)");
   g.addColorStop(1, "rgb(0,0,0)");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
 
-  // subtle noise veil
   const n = 0.02 + Math.min(0.05, idleMs / 25000 * 0.05);
   ctx.fillStyle = `rgba(255,255,255,${n})`;
   for (let i = 0; i < 18; i++) {
@@ -91,6 +87,101 @@ function render(ctx, w, h, idleMs, angle, light) {
     ctx.fillRect(x, y, 1, 1);
   }
 
-  // light spot
   light.draw(ctx, w, h);
+
+  if (light?.spot?.a >= 0.01 && light?.spot?.r > 0) {
+    const sx = light.spot.x;
+    const sy = light.spot.y;
+    const r = light.spot.r;
+
+    const a = angle;
+    const kx = Math.sin(a) * 18;
+    const ky = Math.cos(a * 0.7) * 12;
+
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.38, 0.18 + light.spot.a * 1.2);
+    ctx.lineWidth = 1;
+
+    ctx.strokeStyle = "rgba(255,255,255,0.22)";
+    ctx.beginPath();
+    ctx.ellipse(sx + kx, sy + r * 0.42 + ky, r * 0.55, r * 0.18, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.beginPath();
+    ctx.moveTo(sx - r * 0.55 + kx, sy - r * 0.25 + ky);
+    ctx.lineTo(sx - r * 0.25 + kx, sy + r * 0.55 + ky);
+    ctx.moveTo(sx + r * 0.55 + kx, sy - r * 0.25 + ky);
+    ctx.lineTo(sx + r * 0.25 + kx, sy + r * 0.55 + ky);
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(255,255,255,0.14)";
+    for (let i = 0; i < 5; i++) {
+      const ox = sx + (Math.sin(a * 1.3 + i * 2.1) * 0.5) * (r * 0.62) + kx * 0.4;
+      const oy = sy + (Math.cos(a * 0.9 + i * 1.7) * 0.5) * (r * 0.46) + ky * 0.4;
+      const bw = 6 + ((i * 7) % 9);
+      const bh = 4 + ((i * 5) % 7);
+      ctx.fillRect(ox - bw * 0.5, oy - bh * 0.5, bw, bh);
+    }
+
+    const vg = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
+    vg.addColorStop(0, "rgba(0,0,0,0)");
+    vg.addColorStop(1, "rgba(0,0,0,0.65)");
+    ctx.fillStyle = vg;
+    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
+
+    ctx.restore();
+  }
+
+  // scene: visible only when light spot is active
+  if (light?.spot?.a >= 0.01 && light?.spot?.r > 0) {
+    const sx = light.spot.x;
+    const sy = light.spot.y;
+    const r = light.spot.r;
+
+    // deterministic "stage" around the spot (no external assets)
+    // angle affects layout slightly (so sliding feels like changing facing)
+    const a = angle;
+    const kx = Math.sin(a) * 18;
+    const ky = Math.cos(a * 0.7) * 12;
+
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.38, 0.18 + light.spot.a * 1.2);
+    ctx.lineWidth = 1;
+
+    // draw a few “planes” (floor/wall hints) near the lit area
+    // floor arc
+    ctx.strokeStyle = "rgba(255,255,255,0.22)";
+    ctx.beginPath();
+    ctx.ellipse(sx + kx, sy + r * 0.42 + ky, r * 0.55, r * 0.18, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // wall edge lines
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.beginPath();
+    ctx.moveTo(sx - r * 0.55 + kx, sy - r * 0.25 + ky);
+    ctx.lineTo(sx - r * 0.25 + kx, sy + r * 0.55 + ky);
+    ctx.moveTo(sx + r * 0.55 + kx, sy - r * 0.25 + ky);
+    ctx.lineTo(sx + r * 0.25 + kx, sy + r * 0.55 + ky);
+    ctx.stroke();
+
+    // small “objects” (blocks) inside lit region
+    ctx.fillStyle = "rgba(255,255,255,0.14)";
+    for (let i = 0; i < 5; i++) {
+      const ox = sx + (Math.sin(a * 1.3 + i * 2.1) * 0.5) * (r * 0.62) + kx * 0.4;
+      const oy = sy + (Math.cos(a * 0.9 + i * 1.7) * 0.5) * (r * 0.46) + ky * 0.4;
+      const bw = 6 + ((i * 7) % 9);
+      const bh = 4 + ((i * 5) % 7);
+      ctx.fillRect(ox - bw * 0.5, oy - bh * 0.5, bw, bh);
+    }
+
+    // vignette (keep scene subtle)
+    const vg = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
+    vg.addColorStop(0, "rgba(0,0,0,0)");
+    vg.addColorStop(1, "rgba(0,0,0,0.65)");
+    ctx.fillStyle = vg;
+    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
+
+    ctx.restore();
+  }
 }

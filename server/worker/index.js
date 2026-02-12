@@ -46,9 +46,7 @@ export default {
       const params = new URLSearchParams();
       params.set("amount", "0"); // will be overridden by priceId
       params.set("currency", "jpy");
-      params.set("automatic_payment_methods[enabled]", "true");
-
-      // Attach price reference (for webhook reconciliation later)
+      params.append("payment_method_types[]", "card");
       params.set("metadata[priceId]", String(body.priceId));
 
       // Use Price to derive amount by creating an InvoiceItem is more complex;

@@ -176,5 +176,22 @@ export const audioEvents = (() => {
     }
   }
 
+  function pinch(delta = 0) {
+    if (!armed) return;
+    if (typeof delta !== "number") return;
+    pinchAcc += delta * 0.002;
+    pinchAcc = Math.max(-2.0, Math.min(2.0, pinchAcc));
+  }
+
+  function holdStart() { hold = true; }
+  function holdEnd() { hold = false; }
+
+  function lightTap(lightSetting) {
+    if (!armed) return;
+    if (lightSetting !== "low") return;
+    layers.setAmbience(0.01);
+  }
+
   return { boot, update, step, touch, pinch, holdStart, holdEnd, onUserAction, lightTap };
 })();
+
