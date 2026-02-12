@@ -1,0 +1,44 @@
+{
+  "id": "scene_001",
+  "version": 1,
+
+  "assets": {
+    "albedo": "./albedo.jpg",
+    "depth": "./depth.png",
+    "material": "./material.png"
+  },
+
+  "depth_range_m": {
+    "near": 0.3,
+    "far": 12.0
+  },
+
+  "material_params": {
+    "reflect_min": 0.05,
+    "reflect_max": 0.85
+  },
+
+  "view": {
+    "yaw_to_u_px": 18,
+    "parallax_strength": 0.0
+  },
+
+  "light": {
+    "spot_radius_px": 220,
+    "spot_alpha": 0.28
+  },
+
+  "audio": {
+    "speed_of_sound_mps": 343,
+    "distance_atten_k": 0.18,
+    "distance_lowpass_hz": {
+      "near": 12000,
+      "far": 1800
+    },
+    "early_reflections": {
+      "taps": 3,
+      "max_delay_ms": 80,
+      "gain_decay": 0.55
+    }
+  }
+}
