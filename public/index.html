@@ -94,6 +94,12 @@
       </div>
     </main>
 
+    <script>
+      // Stripe (publishable key) + Worker API endpoint
+      window.__STRIPE_PUBLISHABLE_KEY__ = "pk_live_ここにStripeのPublishableKey全文";
+      window.__STRIPE_PI_ENDPOINT__ = "https://sense-worker.hiroyuki-sugiura-d46.workers.dev/api/create-payment-intent";
+    </script>
+
     <script type="module" src="./js/main.js"></script>
   </body>
 </html>
