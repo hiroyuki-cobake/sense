@@ -11,15 +11,63 @@ let ctx = null;
 let canvas = null;
 let raf = 0;
 
+let scene = null;
+let sceneImg = null;
+let sceneReady = false;
+
+let sceneLayer = null;
+let sceneCtx = null;
+
+async function loadScene() {
+  try {
+    const res = await fetch("./scenes/scene_001/scene.json", { cache: "no-store" });
+    if (!res.ok) return;
+
+    const json = await res.json();
+    scene = json;
+
+    const img = new Image();
+    img.decoding = "async";
+    img.src = json.assets.albedo;
+
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    sceneImg = img;
+    sceneReady = true;
+  } catch {
+    scene = null;
+    sceneImg = null;
+    sceneReady = false;
+  }
+}
+
+function ensureSceneLayerSize(w, h) {
+  if (!sceneLayer) {
+    sceneLayer = document.createElement("canvas");
+    sceneCtx = sceneLayer.getContext("2d");
+  }
+  if (sceneLayer.width !== w || sceneLayer.height !== h) {
+    sceneLayer.width = w;
+    sceneLayer.height = h;
+  }
+}
+
 export function initExperience() {
   canvas = document.getElementById("senseCanvas");
   ctx = canvas.getContext("2d", { alpha: false });
+
+  loadScene();
 
   const resize = () => {
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.floor(canvas.clientWidth * dpr);
     canvas.height = Math.floor(canvas.clientHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ensureSceneLayerSize(canvas.width, canvas.height);
   };
   resize();
   window.addEventListener("resize", resize, { passive: true });
@@ -73,13 +121,20 @@ export function initExperience() {
 }
 
 function render(ctx, w, h, idleMs, angle, light) {
-  const g = ctx.createRadialGradient(w * 0.5, h * 0.55, 0, w * 0.5, h * 0.55, Math.max(w, h) * 0.7);
+  const g = ctx.createRadialGradient(
+    w * 0.5,
+    h * 0.55,
+    0,
+    w * 0.5,
+    h * 0.55,
+    Math.max(w, h) * 0.7
+  );
   g.addColorStop(0, "rgb(5,5,5)");
   g.addColorStop(1, "rgb(0,0,0)");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
 
-  const n = 0.02 + Math.min(0.05, idleMs / 25000 * 0.05);
+  const n = 0.02 + Math.min(0.05, (idleMs / 25000) * 0.05);
   ctx.fillStyle = `rgba(255,255,255,${n})`;
   for (let i = 0; i < 18; i++) {
     const x = (Math.sin((angle + i) * 1.7) * 0.5 + 0.5) * w;
@@ -89,99 +144,51 @@ function render(ctx, w, h, idleMs, angle, light) {
 
   light.draw(ctx, w, h);
 
-  if (light?.spot?.a >= 0.01 && light?.spot?.r > 0) {
+  if (sceneReady && scene && sceneImg && light?.spot?.a >= 0.01 && light?.spot?.r > 0) {
     const sx = light.spot.x;
     const sy = light.spot.y;
-    const r = light.spot.r;
 
-    const a = angle;
-    const kx = Math.sin(a) * 18;
-    const ky = Math.cos(a * 0.7) * 12;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const cw = Math.floor(w * dpr);
+    const ch = Math.floor(h * dpr);
 
-    ctx.save();
-    ctx.globalAlpha = Math.min(0.38, 0.18 + light.spot.a * 1.2);
-    ctx.lineWidth = 1;
+    ensureSceneLayerSize(cw, ch);
 
-    ctx.strokeStyle = "rgba(255,255,255,0.22)";
-    ctx.beginPath();
-    ctx.ellipse(sx + kx, sy + r * 0.42 + ky, r * 0.55, r * 0.18, 0, 0, Math.PI * 2);
-    ctx.stroke();
+    const yawPx = (scene?.view?.yaw_to_u_px ?? 18) * angle;
+    const imgW = sceneImg.naturalWidth || 1;
+    const imgH = sceneImg.naturalHeight || 1;
 
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";
-    ctx.beginPath();
-    ctx.moveTo(sx - r * 0.55 + kx, sy - r * 0.25 + ky);
-    ctx.lineTo(sx - r * 0.25 + kx, sy + r * 0.55 + ky);
-    ctx.moveTo(sx + r * 0.55 + kx, sy - r * 0.25 + ky);
-    ctx.lineTo(sx + r * 0.25 + kx, sy + r * 0.55 + ky);
-    ctx.stroke();
+    const scale = Math.max(cw / imgW, ch / imgH);
+    const drawW = imgW * scale;
+    const drawH = imgH * scale;
 
-    ctx.fillStyle = "rgba(255,255,255,0.14)";
-    for (let i = 0; i < 5; i++) {
-      const ox = sx + (Math.sin(a * 1.3 + i * 2.1) * 0.5) * (r * 0.62) + kx * 0.4;
-      const oy = sy + (Math.cos(a * 0.9 + i * 1.7) * 0.5) * (r * 0.46) + ky * 0.4;
-      const bw = 6 + ((i * 7) % 9);
-      const bh = 4 + ((i * 5) % 7);
-      ctx.fillRect(ox - bw * 0.5, oy - bh * 0.5, bw, bh);
-    }
+    let ox = (-yawPx % drawW);
+    if (ox > 0) ox -= drawW;
 
-    const vg = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
-    vg.addColorStop(0, "rgba(0,0,0,0)");
-    vg.addColorStop(1, "rgba(0,0,0,0.65)");
-    ctx.fillStyle = vg;
-    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
+    sceneCtx.setTransform(1, 0, 0, 1, 0, 0);
+    sceneCtx.globalCompositeOperation = "source-over";
+    sceneCtx.clearRect(0, 0, cw, ch);
 
-    ctx.restore();
-  }
+    sceneCtx.globalAlpha = 1;
+    sceneCtx.drawImage(sceneImg, ox, 0, drawW, drawH);
+    sceneCtx.drawImage(sceneImg, ox + drawW, 0, drawW, drawH);
 
-  // scene: visible only when light spot is active
-  if (light?.spot?.a >= 0.01 && light?.spot?.r > 0) {
-    const sx = light.spot.x;
-    const sy = light.spot.y;
-    const r = light.spot.r;
+    sceneCtx.globalCompositeOperation = "destination-in";
+    const lr = (scene?.light?.spot_radius_px ?? 220) * dpr;
+    const la = (scene?.light?.spot_alpha ?? 0.28);
 
-    // deterministic "stage" around the spot (no external assets)
-    // angle affects layout slightly (so sliding feels like changing facing)
-    const a = angle;
-    const kx = Math.sin(a) * 18;
-    const ky = Math.cos(a * 0.7) * 12;
+    const gx = sx * dpr;
+    const gy = sy * dpr;
+
+    const mask = sceneCtx.createRadialGradient(gx, gy, 0, gx, gy, lr);
+    mask.addColorStop(0, `rgba(255,255,255,${la})`);
+    mask.addColorStop(1, "rgba(255,255,255,0)");
+    sceneCtx.fillStyle = mask;
+    sceneCtx.fillRect(0, 0, cw, ch);
 
     ctx.save();
-    ctx.globalAlpha = Math.min(0.38, 0.18 + light.spot.a * 1.2);
-    ctx.lineWidth = 1;
-
-    // draw a few “planes” (floor/wall hints) near the lit area
-    // floor arc
-    ctx.strokeStyle = "rgba(255,255,255,0.22)";
-    ctx.beginPath();
-    ctx.ellipse(sx + kx, sy + r * 0.42 + ky, r * 0.55, r * 0.18, 0, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // wall edge lines
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";
-    ctx.beginPath();
-    ctx.moveTo(sx - r * 0.55 + kx, sy - r * 0.25 + ky);
-    ctx.lineTo(sx - r * 0.25 + kx, sy + r * 0.55 + ky);
-    ctx.moveTo(sx + r * 0.55 + kx, sy - r * 0.25 + ky);
-    ctx.lineTo(sx + r * 0.25 + kx, sy + r * 0.55 + ky);
-    ctx.stroke();
-
-    // small “objects” (blocks) inside lit region
-    ctx.fillStyle = "rgba(255,255,255,0.14)";
-    for (let i = 0; i < 5; i++) {
-      const ox = sx + (Math.sin(a * 1.3 + i * 2.1) * 0.5) * (r * 0.62) + kx * 0.4;
-      const oy = sy + (Math.cos(a * 0.9 + i * 1.7) * 0.5) * (r * 0.46) + ky * 0.4;
-      const bw = 6 + ((i * 7) % 9);
-      const bh = 4 + ((i * 5) % 7);
-      ctx.fillRect(ox - bw * 0.5, oy - bh * 0.5, bw, bh);
-    }
-
-    // vignette (keep scene subtle)
-    const vg = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
-    vg.addColorStop(0, "rgba(0,0,0,0)");
-    vg.addColorStop(1, "rgba(0,0,0,0.65)");
-    ctx.fillStyle = vg;
-    ctx.fillRect(sx - r, sy - r, r * 2, r * 2);
-
+    ctx.globalAlpha = 1;
+    ctx.drawImage(sceneLayer, 0, 0, w, h);
     ctx.restore();
   }
 }
