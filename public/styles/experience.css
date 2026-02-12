@@ -2,11 +2,12 @@
   position:absolute;
   inset:0;
   z-index:0;            /* 背面 */
-  pointer-events:none;  /* UIを邪魔しない */
+  pointer-events:auto;  /* 体験入力を受ける */
 }
 
 .sense-canvas{
   width:100%;
   height:100%;
   display:block;
+  touch-action:none;    /* iOSジェスチャ抑止（ピンチ/スワイプをJSで扱う） */
 }

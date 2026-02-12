@@ -23,6 +23,8 @@ export function initInput({
 
   const now = () => performance.now();
 
+  let pointerIsDown = false;
+
   const pointerDown = (e) => {
     onAnyInput?.();
 
@@ -33,6 +35,8 @@ export function initInput({
       pinchStartDist = dist(touches[0], touches[1]);
       return;
     }
+
+    pointerIsDown = true;
 
     roamActive = true;
     lastX = getPointX(e);
@@ -61,6 +65,13 @@ export function initInput({
     onAnyInput?.();
 
     const x = getPointX(e);
+    const y = getPointY(e);
+
+    // ライト用：押下中はスポットを追従させる
+    if (pointerIsDown) {
+      onTapSpot?.(x, y);
+    }
+
     const dx = x - lastX;
     lastX = x;
     onRoam?.(dx);
@@ -71,6 +82,8 @@ export function initInput({
       if (!e.touches || e.touches.length < 2) pinchActive = false;
       return;
     }
+
+    pointerIsDown = false;
 
     roamActive = false;
     clearTimeout(holdTimer);
