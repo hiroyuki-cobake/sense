@@ -17,8 +17,14 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm install
+      - run: npm ci
       - run: npm run build
+
+      - name: Sync dist -> docs
+        run: |
+          rm -rf docs
+          mkdir -p docs
+          rsync -a --delete dist/ docs/
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
