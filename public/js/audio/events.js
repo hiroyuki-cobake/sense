@@ -8,6 +8,37 @@ export const audioEvents = (() => {
   let pinchAcc = 0;
   let footstepPhase = 0;
 
+    let lastBeatAt = 0;
+
+  function playHeartBeat() {
+    if (!audio.ac) return;
+
+    const ac = audio.ac;
+    const t = ac.currentTime;
+
+    const osc = ac.createOscillator();
+    const g = ac.createGain();
+    const f = ac.createBiquadFilter();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(55, t);
+    osc.frequency.exponentialRampToValueAtTime(42, t + 0.09);
+
+    f.type = "lowpass";
+    f.frequency.setValueAtTime(180, t);
+
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(0.12, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+
+    osc.connect(f);
+    f.connect(g);
+    g.connect(audio.master);
+
+    osc.start(t);
+    osc.stop(t + 0.2);
+  }
+
   function boot() {
     if (!audio.started) return;
     layers.boot();
@@ -38,12 +69,21 @@ export const audioEvents = (() => {
     layers.setTone(t, 150 + Math.sin(performance.now() / 1500) * 8);
 
     if (hold) {
-      // hold-walk creates gentle rhythm that can be mistaken as “distance”
       const pulse = (Math.sin(performance.now() / 140) + 1) * 0.5;
       layers.setTone(Math.max(t, 0.01 + pulse * 0.01), 140);
     }
 
-    // pinch shifts “distance feeling” (not actual)
+    // === HEARTBEAT (action-based) ===
+    const { actionCount } = state.runtime;
+    const bpm = 60 + Math.min(35, actionCount * 0.4);
+    const interval = 60000 / bpm;
+    const nowMs = performance.now();
+
+    if (!lastBeatAt || nowMs - lastBeatAt > interval) {
+      lastBeatAt = nowMs;
+      playHeartBeat();
+    }
+
     pinchAcc *= 0.96;
   }
 
