@@ -20,11 +20,28 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Sync dist -> docs
+      - name: Detect build output dir
+        id: outdir
         run: |
+          if [ -d dist ]; then echo "out=dist" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ -d docs ]; then echo "out=docs" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ -d public/dist ]; then echo "out=public/dist" >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo "Build output dir not found."
+          ls -la
+          find . -maxdepth 3 -type f \( -name "index.html" -o -name "main-*.js" -o -name "main-*.css" \) | head -n 50
+          exit 1
+
+      - name: Sync build output -> docs
+        env:
+          OUT: ${{ steps.outdir.outputs.out }}
+        run: |
+          if [ "$OUT" = "docs" ]; then
+            echo "Build output is already docs/ (skip sync)"
+            exit 0
+          fi
           rm -rf docs
           mkdir -p docs
-          rsync -a --delete dist/ docs/
+          rsync -a --delete "$OUT"/ docs/
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
