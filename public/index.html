@@ -10,7 +10,22 @@
     <meta name="theme-color" content="#000000" />
     <title>sense</title>
 
-    <link rel="manifest" href="./pwa/manifest.webmanifest" />
+    <!-- PWA manifest (disable on dev to avoid CORS noise) -->
+    <script>
+      (function () {
+        const h = location.hostname;
+        const isDev =
+          h === "localhost" ||
+          h === "127.0.0.1" ||
+          h.endsWith(".app.github.dev");
+        if (isDev) return;
+        const link = document.createElement("link");
+        link.rel = "manifest";
+        link.href = "./pwa/manifest.webmanifest";
+        document.head.appendChild(link);
+      })();
+    </script>
+
     <link rel="icon" href="./assets/icons/favicon.ico" />
     <link rel="apple-touch-icon" href="./assets/icons/favicon.ico" />
     <link rel="stylesheet" href="./styles/base.css" />
