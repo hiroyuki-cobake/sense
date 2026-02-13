@@ -19,19 +19,13 @@ jobs:
 
       - run: npm ci
 
-      - name: Build (force outDir=dist)
-        run: npx vite build --outDir dist
+      - name: Build (force outDir=docs)
+        run: npx vite build --outDir docs
 
-      - name: Verify dist exists
+      - name: Verify docs exists
         run: |
           ls -la
-          ls -la dist
-
-      - name: Sync dist -> docs
-        run: |
-          rm -rf docs
-          mkdir -p docs
-          rsync -a --delete dist/ docs/
+          ls -la docs
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
