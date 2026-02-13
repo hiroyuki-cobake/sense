@@ -41,6 +41,8 @@ export const state = {
   runtime: {
     lastInputAt: performance.now(),
     idleMs: 0,
+    actionCount: 0,
+    lastActionAt: 0,
   },
 };
 
@@ -75,7 +77,10 @@ export function hasItem(kind, id) {
 }
 
 export function touchInput() {
-  state.runtime.lastInputAt = performance.now();
+  const t = performance.now();
+  state.runtime.lastInputAt = t;
+  state.runtime.actionCount += 1;
+  state.runtime.lastActionAt = t;
 }
 
 export function getIdleMs(now = performance.now()) {
