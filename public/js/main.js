@@ -55,11 +55,6 @@ function boot() {
 
   // ---- Robust double-tap / double-click detection (pointer-based) ----
   // ここでCSSがpointer-events: noneでも拾える確率を上げる（最小限の上書き）
-  if (logoWrap) {
-    logoWrap.style.pointerEvents = "auto";
-    logoWrap.style.touchAction = "manipulation"; // iOSのダブルタップズーム抑制
-    logoWrap.style.cursor = "pointer";
-  }
 
   let lastPointerUpAt = 0;
   const DOUBLE_TAP_MS = 320;
