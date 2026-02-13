@@ -20,16 +20,12 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Detect build output dir
+      - name: Detect Vite outDir
         id: outdir
         run: |
-          if [ -d dist ]; then echo "out=dist" >> "$GITHUB_OUTPUT"; exit 0; fi
-          if [ -d docs ]; then echo "out=docs" >> "$GITHUB_OUTPUT"; exit 0; fi
-          if [ -d public/dist ]; then echo "out=public/dist" >> "$GITHUB_OUTPUT"; exit 0; fi
-          echo "Build output dir not found."
-          ls -la
-          find . -maxdepth 3 -type f \( -name "index.html" -o -name "main-*.js" -o -name "main-*.css" \) | head -n 50
-          exit 1
+          OUT=$(node -e "const c=require('./vite.config.js'); const out=c?.build?.outDir || 'dist'; console.log(out);")
+          echo "out=$OUT" >> "$GITHUB_OUTPUT"
+          echo "Detected outDir=$OUT"
 
       - name: Sync build output -> docs
         env:

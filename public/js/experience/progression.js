@@ -102,6 +102,9 @@ export function initExperience() {
       light.tapSpot(x, y, state.settings.light, state.settings.hand);
       audioEvents.lightTap(state.settings.light);
     },
+    onTripleTap: () => {
+      audioEvents.tripleTap();
+    },
   });
 
   window.addEventListener("sense-unlock-audio", () => {

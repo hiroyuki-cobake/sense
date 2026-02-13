@@ -1,6 +1,7 @@
 // public/js/audio/events.js
 import { audio } from "./audio_engine.js";
 import { layers } from "./layers.js";
+import { state } from "../state.js";
 
 export const audioEvents = (() => {
   let armed = false;
@@ -28,15 +29,15 @@ export const audioEvents = (() => {
     f.frequency.setValueAtTime(180, t);
 
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(0.12, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+    g.gain.linearRampToValueAtTime(0.028, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
 
     osc.connect(f);
     f.connect(g);
     g.connect(audio.master);
 
     osc.start(t);
-    osc.stop(t + 0.2);
+    osc.stop(t + 0.24);
   }
 
   function boot() {
@@ -73,15 +74,17 @@ export const audioEvents = (() => {
       layers.setTone(Math.max(t, 0.01 + pulse * 0.01), 140);
     }
 
-    // === HEARTBEAT (action-based) ===
-    const { actionCount } = state.runtime;
-    const bpm = 60 + Math.min(35, actionCount * 0.4);
-    const interval = 60000 / bpm;
-    const nowMs = performance.now();
+    // === HEARTBEAT (action-based, idle only) ===
+    if (idleMs > 650) {
+      const { actionCount } = state.runtime;
+      const bpm = 60 + Math.min(35, actionCount * 0.4);
+      const interval = 60000 / bpm;
+      const nowMs = performance.now();
 
-    if (!lastBeatAt || nowMs - lastBeatAt > interval) {
-      lastBeatAt = nowMs;
-      playHeartBeat();
+      if (!lastBeatAt || nowMs - lastBeatAt > interval) {
+        lastBeatAt = nowMs;
+        playHeartBeat();
+      }
     }
 
     pinchAcc *= 0.96;
