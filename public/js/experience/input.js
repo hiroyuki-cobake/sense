@@ -8,6 +8,7 @@ export function initInput({
   onTouch,
   onPinch,
   onTapSpot,
+  onTripleTap,
 }) {
   let lastTapAt = 0;
   let tapCount = 0;
@@ -109,11 +110,11 @@ export function initInput({
 
     // interpret after short delay
     window.setTimeout(() => {
-        if (now() - lastTapAt > 280) {
-          if (tapCount >= 3) onStep?.(-1);
-          else onTouch?.(); // 1tap/2tap は touch（棒/グローブ用途に寄せる）
-          tapCount = 0;
-        }
+      if (now() - lastTapAt > 280) {
+        if (tapCount >= 3) onTripleTap?.();
+        else onTouch?.(); // 1tap/2tap は touch（棒/グローブ用途に寄せる）
+        tapCount = 0;
+      }
     }, 300);
   };
 
