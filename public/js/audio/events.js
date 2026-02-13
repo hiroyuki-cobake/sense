@@ -192,6 +192,11 @@ export const audioEvents = (() => {
     layers.setAmbience(0.01);
   }
 
-  return { boot, update, step, touch, pinch, holdStart, holdEnd, onUserAction, lightTap };
-})();
+  function tripleTap() {
+    if (!armed) return;
+    layers.setAmbience(0.01);
+    layers.setTone(0.02, 130);
+  }
 
+  return { boot, update, step, touch, pinch, holdStart, holdEnd, onUserAction, lightTap, tripleTap };
+})();
